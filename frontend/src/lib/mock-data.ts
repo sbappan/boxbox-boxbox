@@ -6,6 +6,12 @@ export type Review = {
   date: string;
 };
 
+export type Race = {
+  id: string;
+  name: string;
+  latestRace?: boolean;
+};
+
 export const mockReviews: Review[] = [
   {
     author: "Jane Doe",
@@ -99,3 +105,32 @@ export const mockReviews: Review[] = [
     date: "2025-07-12",
   },
 ];
+
+export const races2025: Race[] = [
+  { id: "austrian-grand-prix-2025", name: "Austrian GP", latestRace: true },
+  { id: "british-grand-prix-2025", name: "British GP" },
+  { id: "belgian-grand-prix-2025", name: "Belgian GP" },
+  { id: "hungarian-grand-prix-2025", name: "Hungarian GP" },
+  { id: "dutch-grand-prix-2025", name: "Dutch GP" },
+  { id: "italian-grand-prix-2025", name: "Italian GP" },
+  { id: "azerbaijan-grand-prix-2025", name: "Azerbaijan GP" },
+  { id: "singapore-grand-prix-2025", name: "Singapore GP" },
+  { id: "united-states-grand-prix-2025", name: "United States GP" },
+  { id: "mexico-city-grand-prix-2025", name: "Mexico City GP" },
+  { id: "são-paulo-grand-prix-2025", name: "São Paulo GP" },
+  { id: "las-vegas-grand-prix-2025", name: "Las Vegas GP" },
+  { id: "qatar-grand-prix-2025", name: "Qatar GP" },
+  { id: "abu-dhabi-grand-prix-2025", name: "Abu Dhabi GP" },
+  { id: "australian-grand-prix-2025", name: "Australian GP" },
+  { id: "chinese-grand-prix-2025", name: "Chinese GP" },
+  { id: "japanese-grand-prix-2025", name: "Japanese GP" },
+  { id: "bahrain-grand-prix-2025", name: "Bahrain GP" },
+  { id: "saudi-arabian-grand-prix-2025", name: "Saudi Arabian GP" },
+  { id: "miami-grand-prix-2025", name: "Miami GP" },
+  { id: "emilia-romagna-grand-prix-2025", name: "Emilia Romagna GP" },
+  { id: "monaco-grand-prix-2025", name: "Monaco GP" },
+  { id: "spanish-grand-prix-2025", name: "Spanish GP" },
+  { id: "canadian-grand-prix-2025", name: "Canadian GP" },
+];
+
+export const grandPrixes: Race[] = [...races2025];
