@@ -1,5 +1,4 @@
-import React from "react";
-import type { Review } from "../lib/mock-data";
+import type { Review } from "../lib/types";
 import ReviewListItem from "./review-list-item";
 
 type ReviewListProps = {

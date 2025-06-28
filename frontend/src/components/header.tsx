@@ -1,5 +1,5 @@
 import { ModeToggle } from "./ui/mode-toggle";
-import { races2025 } from "@/lib/mock-data";
+import { useRaces } from "@/lib/queries";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -10,6 +10,9 @@ import {
 } from "./ui/navigation-menu";
 
 export function Header() {
+  const { data: races, isLoading, isError } = useRaces();
+  console.log("races", { races });
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
@@ -29,19 +32,30 @@ export function Header() {
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="w-56 p-1">
-                  {races2025.map((race) => (
-                    <NavigationMenuLink
-                      key={race.id}
-                      href={`#${race.id}`}
-                      className={`w-full flex flex-row justify-start items-center text-left px-3 py-1.5 rounded-md transition-all duration-200 text-sm ${
-                        race.latestRace
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                          : "hover:bg-accent/50"
-                      }`}
-                    >
-                      {race.name}
-                    </NavigationMenuLink>
-                  ))}
+                  {isLoading && (
+                    <div className="px-3 py-1.5 text-sm text-muted-foreground">
+                      Loading races...
+                    </div>
+                  )}
+                  {isError && (
+                    <div className="px-3 py-1.5 text-sm text-destructive">
+                      Failed to load races
+                    </div>
+                  )}
+                  {races &&
+                    races.map((race) => (
+                      <NavigationMenuLink
+                        key={race.id}
+                        href={`#${race.id}`}
+                        className={`w-full flex flex-row justify-start items-center text-left px-3 py-1.5 rounded-md transition-all duration-200 text-sm ${
+                          race.latestRace
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                            : "hover:bg-accent/50"
+                        }`}
+                      >
+                        {race.name}
+                      </NavigationMenuLink>
+                    ))}
                 </div>
               </NavigationMenuContent>
             </NavigationMenuItem>

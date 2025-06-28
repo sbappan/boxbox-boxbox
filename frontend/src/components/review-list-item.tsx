@@ -1,5 +1,5 @@
 import React from "react";
-import type { Review } from "../lib/mock-data";
+import type { Review } from "../lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type ReviewListItemProps = {

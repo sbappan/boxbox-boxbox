@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Review } from "../lib/mock-data";
+import type { Review } from "../lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 type ReviewFormProps = {
   onSubmit: (review: Omit<Review, "date" | "avatarUrl">) => void;
+  isSubmitting?: boolean;
 };
 
-const ReviewForm = ({ onSubmit }: ReviewFormProps) => {
+const ReviewForm = ({ onSubmit, isSubmitting = false }: ReviewFormProps) => {
   const [author, setAuthor] = useState("");
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
@@ -78,7 +79,9 @@ const ReviewForm = ({ onSubmit }: ReviewFormProps) => {
               required
             />
           </div>
-          <Button type="submit">Submit Review</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Review"}
+          </Button>
         </form>
       </CardContent>
     </Card>
