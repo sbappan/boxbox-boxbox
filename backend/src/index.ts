@@ -4,7 +4,7 @@ import { cors } from "hono/cors";
 import { env } from "./config/env.js";
 import { auth } from "./auth/index.js";
 import { db } from "./db/index.js";
-import { posts, users } from "./db/schema.js";
+import { users, races } from "./db/schema.js";
 import { eq } from "drizzle-orm";
 
 const app = new Hono();
@@ -23,68 +23,55 @@ app.get("/", (c) => {
     message: "Welcome to the F1 Review Site API",
     endpoints: {
       auth: "/api/auth/*",
-      posts: "/api/posts",
       users: "/api/users/:id",
+      races: "/api/races",
     },
   });
 });
 
-// Example: Get all posts (public)
-app.get("/api/posts", async (c) => {
+// Get all races (public)
+app.get("/api/races", async (c) => {
   try {
-    const allPosts = await db
+    const allRaces = await db
       .select({
-        id: posts.id,
-        title: posts.title,
-        content: posts.content,
-        published: posts.published,
-        createdAt: posts.createdAt,
-        author: {
-          id: users.id,
-          name: users.name,
-          email: users.email,
-        },
+        id: races.id,
+        slug: races.slug,
+        name: races.name,
+        latestRace: races.latestRace,
       })
-      .from(posts)
-      .leftJoin(users, eq(posts.authorId, users.id))
-      .where(eq(posts.published, true));
+      .from(races);
 
-    return c.json({ posts: allPosts });
+    return c.json(allRaces);
   } catch (error) {
-    return c.json({ error: "Failed to fetch posts" }, 500);
+    console.error("Failed to fetch races:", error);
+    return c.json({ error: "Failed to fetch races" }, 500);
   }
 });
 
-// Example: Protected endpoint - Create a post
-app.post("/api/posts", async (c) => {
-  // Get session from better-auth
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
-  if (!session) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
+// Get race by slug (public)
+app.get("/api/races/:slug", async (c) => {
+  const slug = c.req.param("slug");
 
   try {
-    const body = await c.req.json();
-    const { title, content, published = false } = body;
+    const [race] = await db
+      .select({
+        id: races.id,
+        slug: races.slug,
+        name: races.name,
+        latestRace: races.latestRace,
+      })
+      .from(races)
+      .where(eq(races.slug, slug))
+      .limit(1);
 
-    if (!title) {
-      return c.json({ error: "Title is required" }, 400);
+    if (!race) {
+      return c.json({ error: "Race not found" }, 404);
     }
 
-    const [newPost] = await db
-      .insert(posts)
-      .values({
-        title,
-        content,
-        published,
-        authorId: session.user.id,
-      })
-      .returning();
-
-    return c.json({ post: newPost }, 201);
+    return c.json({ race });
   } catch (error) {
-    return c.json({ error: "Failed to create post" }, 500);
+    console.error("Failed to fetch race:", error);
+    return c.json({ error: "Failed to fetch race" }, 500);
   }
 });
 
@@ -147,5 +134,6 @@ serve(
     console.log(`🚀 Server is running on http://localhost:${info.port}`);
     console.log(`📚 API Documentation: http://localhost:${info.port}`);
     console.log(`🔐 Auth endpoints: http://localhost:${info.port}/api/auth/*`);
+    console.log(`🏁 Races endpoint: http://localhost:${info.port}/api/races`);
   }
 );

@@ -96,8 +96,6 @@ The server will start at `http://localhost:3000`
 
 - `GET /` - API welcome message
 - `GET /health` - Health check endpoint
-- `GET /api/posts` - Get all published posts (public)
-- `POST /api/posts` - Create a new post (protected)
 - `GET /api/users/:id` - Get user profile (protected)
 
 ## 🗄️ Database Management
@@ -146,7 +144,7 @@ curl -X POST http://localhost:3000/api/auth/signin \
 ```bash
 # First login to get session cookie
 # Then use the cookie for protected routes
-curl http://localhost:3000/api/posts \
+curl http://localhost:3000/api/races \
   -H "Cookie: your-session-cookie"
 ```
 
