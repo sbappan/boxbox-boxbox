@@ -1,13 +1,11 @@
 import GrandPrixReviewPage from "./components/grand-prix-review-page";
-import { ModeToggle } from "./components/ui/mode-toggle";
+import { Header } from "./components/header";
 
 function App() {
   return (
-    <div className="bg-background text-foreground">
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-end p-4">
-          <ModeToggle />
-        </div>
+    <div className="relative flex min-h-screen w-full flex-col before:absolute before:inset-0 before:-z-10 before:bg-[url(./assets/images/bg.svg)] before:bg-repeat before:bg-center before:opacity-20 sm:px-20 sm:before:bg-cover sm:before:bg-no-repeat dark:before:opacity-30">
+      <Header />
+      <main className="py-8">
         <GrandPrixReviewPage />
       </main>
     </div>
