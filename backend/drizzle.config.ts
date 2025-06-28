@@ -1,8 +1,10 @@
 import { defineConfig } from "drizzle-kit";
+import { expand } from "dotenv-expand";
+
 import { config } from "dotenv";
 
-// Load environment variables
-config();
+// Load environment variables with expansion
+expand(config());
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
