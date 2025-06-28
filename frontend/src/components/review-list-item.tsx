@@ -34,21 +34,27 @@ const ReviewListItem = ({ review }: ReviewListItemProps) => {
         />
         <div className="flex-1">
           <CardTitle>{review.author}</CardTitle>
-          <p className="text-sm text-gray-500">{review.date}</p>
+          <p className="text-sm text-gray-500 dark:text-muted-foreground">
+            {review.date}
+          </p>
         </div>
         <div className="flex items-center gap-1">
           {Array.from({ length: 5 }, (_, i) => (
             <StarIcon
               key={i}
               className={`w-5 h-5 ${
-                i < review.rating ? "text-yellow-400" : "text-gray-300"
+                i < review.rating
+                  ? "text-yellow-400"
+                  : "text-gray-300 dark:text-muted-foreground"
               }`}
             />
           ))}
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-700">{review.text}</p>
+        <p className="text-gray-700 dark:text-muted-foreground">
+          {review.text}
+        </p>
       </CardContent>
     </Card>
   );
