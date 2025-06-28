@@ -1,5 +1,11 @@
+import GrandPrixReviewPage from "./components/grand-prix-review-page";
+
 function App() {
-  return <h1>F1 Review Site</h1>;
+  return (
+    <main>
+      <GrandPrixReviewPage />
+    </main>
+  );
 }
 
 export default App;
