@@ -5,8 +5,11 @@ import {
   uuid,
   boolean,
   integer,
+  varchar,
+  unique,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // User table for better-auth
 export const users = pgTable("users", {
@@ -70,11 +73,50 @@ export const posts = pgTable("posts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+const races = pgTable("race", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  latestRace: boolean("latestRace").notNull().default(false),
+});
+
+const raceReviews = pgTable(
+  "race-review",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    raceId: uuid("raceId")
+      .notNull()
+      .references(() => races.id, { onDelete: "cascade" }),
+    reviewNumber: integer("review_number").notNull(), // 1-5 to limit reviews per user per race
+    rating: integer("rating").notNull(),
+    comment: text("comment"),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    // Ensure unique combination of userId, raceId, and reviewNumber
+    userRaceReviewNumber: unique("user_race_review_number").on(
+      table.userId,
+      table.raceId,
+      table.reviewNumber
+    ),
+    // Add check constraint to limit reviewNumber to 1-5
+    reviewNumberCheck: check(
+      "review_number_check",
+      sql`${table.reviewNumber} >= 1 AND ${table.reviewNumber} <= 5`
+    ),
+  })
+);
+
 // Define relations
 export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
   posts: many(posts),
+  raceReviews: many(raceReviews),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -98,6 +140,21 @@ export const postsRelations = relations(posts, ({ one }) => ({
   }),
 }));
 
+export const racesRelations = relations(races, ({ many }) => ({
+  reviews: many(raceReviews),
+}));
+
+export const raceReviewsRelations = relations(raceReviews, ({ one }) => ({
+  user: one(users, {
+    fields: [raceReviews.userId],
+    references: [users.id],
+  }),
+  race: one(races, {
+    fields: [raceReviews.raceId],
+    references: [races.id],
+  }),
+}));
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -107,3 +164,7 @@ export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
+export type Race = typeof races.$inferSelect;
+export type NewRace = typeof races.$inferInsert;
+export type RaceReview = typeof raceReviews.$inferSelect;
+export type NewRaceReview = typeof raceReviews.$inferInsert;
