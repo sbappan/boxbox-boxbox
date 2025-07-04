@@ -49,7 +49,7 @@ export async function fetchReviewById(reviewId: string): Promise<Review> {
 }
 
 export async function createReview(
-  reviewData: Omit<Review, "date" | "avatarUrl">
+  reviewData: Omit<Review, "date" | "avatarUrl" | "id"> & { raceId: string }
 ): Promise<Review> {
   return apiRequest<Review>("/api/reviews", {
     method: "POST",

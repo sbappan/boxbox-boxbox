@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { StarIcon } from "@/components/ui/star-icon";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { authClient } from "@/lib/auth-client";
 
 type ReviewFormProps = {
   onSubmit: (review: Omit<Review, "date" | "avatarUrl">) => void;
@@ -13,23 +14,41 @@ type ReviewFormProps = {
 };
 
 const ReviewForm = ({ onSubmit, isSubmitting = false }: ReviewFormProps) => {
-  const [author, setAuthor] = useState("");
+  const session = {
+    user: {
+      name: "John Doe",
+    },
+  };
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!author || !text) {
+    if (!session?.user || !text) {
       // Basic validation
       return;
     }
-    onSubmit({ author, text, rating });
+    onSubmit({ author: session.user.name, text, rating });
     // Reset form
-    setAuthor("");
     setText("");
     setRating(5);
   };
+
+  if (!session?.user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Leave a Review</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Please sign in to leave a review.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -42,10 +61,9 @@ const ReviewForm = ({ onSubmit, isSubmitting = false }: ReviewFormProps) => {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="Your name"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              required
+              value={session.user.name}
+              disabled
+              className="bg-muted"
             />
           </div>
           <div className="space-y-2">
