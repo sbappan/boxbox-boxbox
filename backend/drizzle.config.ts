@@ -7,7 +7,7 @@ import { config } from "dotenv";
 expand(config());
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",
+  schema: "./src/db/schema/index.ts",
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {

@@ -1,37 +1,59 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+
 import { db } from "../db/index.js";
-import { users, sessions, accounts, verifications } from "../db/schema.js";
+import { env } from "../config/env.js";
+import * as schema from "../db/schema/index.js";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: {
-      user: users,
-      session: sessions,
-      account: accounts,
-      verification: verifications,
-    },
+    schema,
   }),
-  secret: process.env.BETTER_AUTH_SECRET!,
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  // Allow requests from the frontend development server
+  trustedOrigins: ["http://localhost:5173"],
+  // Add the baseURL and redirect configuration
+  baseURL: "http://localhost:3000",
+  // Configure redirect URLs for OAuth success/error
+  redirectTo: "http://localhost:5173",
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Set to true if you want email verification
   },
   socialProviders: {
-    // Uncomment and configure if you want OAuth providers
-    // github: {
-    //   clientId: process.env.GITHUB_CLIENT_ID!,
-    //   clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    // },
-    // google: {
-    //   clientId: process.env.GOOGLE_CLIENT_ID!,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    // },
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID as string,
+      clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+      // Add redirect URI configuration
+      redirectURI: "http://localhost:3000/api/auth/callback/google",
+    },
   },
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
+  // Add success/error redirect URLs
+  callbacks: {
+    signIn: {
+      before: async (session, request) => {
+        return session;
+      },
+      after: async (session, request) => {
+        return session;
+      },
+    },
+  },
+  // Configure where to redirect after successful authentication
+  pages: {
+    signIn: "http://localhost:5173",
+    signUp: "http://localhost:5173",
+    error: "http://localhost:5173",
+  },
+  advanced: {
+    database: {
+      generateId: false,
+    },
+    // Override default redirect behavior
+    defaultRedirectURL: "http://localhost:5173",
   },
 });
+
+export type AuthType = {
+  user: typeof auth.$Infer.Session.user | null;
+  session: typeof auth.$Infer.Session.session | null;
+};
